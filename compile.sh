@@ -1,2 +1,2 @@
 cd "$(dirname "$0")"
-pyinstaller --onefile toml-editor.py
+pyinstaller --onefile --add-data "settings.toml;." toml-editor.py

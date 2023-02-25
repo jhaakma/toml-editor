@@ -1,8 +1,21 @@
+import os
+import sys
 from tkinter import *
+import pkg_resources
 import toml
 
-path_to_config = ""
-with open("settings.toml", "r") as f:
+
+def get_settings_path():
+    # Check if the script is running from a PyInstaller bundle
+    if getattr(sys, 'frozen', False):
+        # Return the path to the bundled settings.toml
+        return os.path.join(sys._MEIPASS, 'settings.toml')
+    else:
+        # Return the path to the settings.toml in the source directory
+        return os.path.abspath(os.path.join(os.path.dirname(__file__), 'settings.toml'))
+
+# Load the settings from the TOML file
+with open(get_settings_path(), 'r') as f:
     settings = toml.load(f)
 
 # Read the list of settings from a TOML file
