@@ -1,0 +1,3 @@
+title = "CSSE Editor"
+path_to_config = "csse.toml"
+window_size = "450x800"
