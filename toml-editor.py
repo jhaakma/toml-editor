@@ -1,7 +1,7 @@
 import os
 import sys
 from tkinter import *
-import toml
+import toml, json
 import argparse
 
 settings = {}
@@ -23,7 +23,7 @@ def get_settings_path():
         # Return the path to the settings.toml in the source directory
         return os.path.abspath(os.path.join(os.path.dirname(__file__), 'settings.toml'))
 
-def get_toml_settings():
+def get_settings():
     toml_settings = {}
     try:
         with open(get_settings_path(), 'r') as f:
@@ -48,7 +48,7 @@ def get_pyinstaller_settings():
 
 
 args = get_args()
-toml_settings = get_toml_settings()
+toml_settings = get_settings()
 pyinstaller_settings = get_pyinstaller_settings()
 
 title = args.title or pyinstaller_settings.get('title') or toml_settings.get('title') or 'Toml Editor'
@@ -60,7 +60,10 @@ print(f"title: {title}, path: {path}, window_size: {window_size}")
 # Read the list of settings from a TOML file
 print(f"path: {path}")
 with open(path, "r") as f:
-    config = toml.load(f)
+    if path.endswith('.toml'):
+        config = toml.load(f)
+    elif path.endswith('.json'):
+        config = json.load(f)
 
 root = Tk()
 root.title(title)
@@ -125,7 +128,7 @@ def render_settings(current_settings, current_fields, parent_frame):
             elif isinstance(value, list):
                 current_fields[key] = value
                 text = Text(parent_frame, width=50, height=len(value))
-                text.grid(row=row, column=1, sticky="w", padx=5, pady=5)
+                text.grid(row=row,   column=1, sticky="w", padx=5, pady=5)
 
                 # insert each item in the list on a separate line
                 for item in value:
@@ -178,7 +181,12 @@ scrollbar.pack(side="right", fill="y")
 # Create a save button to update the TOML file
 def save():
     with open(path, "w") as f:
-        toml.dump(fields, f)
+        if path.endswith('.toml'):
+            toml.dump(fields, f)
+        elif path.endswith('.json'):
+            json.dump(fields, f, indent=4)
+        else:
+            raise Exception("Invalid file type")
 
 # Create a frame to hold the save button
 button_frame = Frame(frame)
